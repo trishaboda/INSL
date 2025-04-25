@@ -1,28 +1,27 @@
-def columnar_transposition_encrypt(plaintext, key):
-    key_length = len(key)
-    num_rows = -(-len(plaintext) // key_length) 
-    matrix = [['' for _ in range(key_length)] for _ in range(num_rows)]
+def encrypt(message, key):
+    return ''.join(message[i::key] for i in range(key))
 
-    index = 0
-    for row in range(num_rows):
-        for col in range(key_length):
-            if index < len(plaintext):
-                matrix[row][col] = plaintext[index]
-                index += 1
-            else:
-                matrix[row][col] = ' '  
 
-    key_order = sorted(list(enumerate(key)), key=lambda x: x[1])
-    ciphertext = ''
+def decrypt(ciphertext, key):
+    num_rows = len(ciphertext) // key
+    num_cols = key
+    num_shaded = (num_cols * num_rows) - len(ciphertext)
 
-    for idx, _ in key_order:
-        for row in range(num_rows):
-            ciphertext += matrix[row][idx]
+    plaintext = [''] * num_rows
+    col, row = 0, 0
 
-    return ciphertext
+    for symbol in ciphertext: 
+        plaintext[row] += symbol
+        row += 1
+        if (row == num_rows) or (row == num_rows - 1 and col >= num_cols - num_shaded):
+            row = 0
+            col += 1
 
-plaintext = input("Enter the plaintext: ").replace(" ", "")
-key = input("Enter the key (alphabetic): ")
+    return ''.join(plaintext)
 
-encrypted = columnar_transposition_encrypt(plaintext, key)
-print("\nEncrypted Text:", encrypted)
+msg = input("Enter the message to encrypt: ")
+key = int(input("Enter the key: "))
+
+encrypted_text = encrypt(msg, key)
+print("Encrypted:", encrypted_text)
+
